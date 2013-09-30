@@ -50,7 +50,21 @@ def single_record(database,collection,_id):
     cur = connection[database][collection].find_one( {'_id': ObjectId(_id)} )
     for doc in cur:
         doc_list += "<strong>%s:</strong> %s<br />" % ( doc, cur[doc] )
-    return "<h1>Database: %s</h1><h2>collection: %s</h2><h3>record: %s</h3>%s" % ( database, collection, _id,  doc_list  )
+    message = "<br /><a href=\"/%s/%s/%s/remove\">Remove this document</a>" % ( database, collection, _id )
+    return "<h1>Database: %s</h1><h2>collection: %s</h2><h3>record: %s</h3>%s%s" % ( database, collection, _id,  doc_list, message  )
+
+#------------------------------------------------------------------------------
+@APP.route('/<database>/<collection>/<_id>/remove')
+def remove_record(database,collection,_id):
+    """ Removes a record from the collection. Useful for deleting bad records.
+    """
+    doc_list = ""
+    cur = connection[database][collection].find_and_modify( {'_id': ObjectId(_id)}, remove=True )
+    for doc in cur:
+        doc_list += "<strong>%s:</strong> %s<br />" % ( doc, cur[doc] )
+    message = "<br /><strong>Document has been removed</strong>"
+    message += "<br /><a href=\"/%s/%s/\">Return to Collection" % ( database, collection )
+    return "<h1>Database: %s</h1><h2>collection: %s</h2><h3>record: %s</h3>%s%s" % ( database, collection, _id,  doc_list, message  )
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
